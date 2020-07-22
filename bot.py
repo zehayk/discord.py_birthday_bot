@@ -8,11 +8,7 @@ import discord.ext
 from dotenv import load_dotenv
 
 load_dotenv()
-# Use TESTING_BOT for the bot user dedicated to testing
-# and DISCORD_TOKEN for the real bot user
 TOKEN = os.getenv('DISCORD_TOKEN')
-# Use CHANNEL_ID_TEST for test channel
-# and CHANNEL_ID for real channel
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 client = discord.Client()
 
@@ -142,10 +138,3 @@ async def on_message(msg):
             json.dump(data, file)
 
 client.run(TOKEN)
-
-# client.loop.create_task(search_submissions())
-# if __name__ == "__main__":
-#    client.run(TOKEN)
-#    client.bg_task = client.loop.create_task(client.check_for_birthday())
-#    print('loop started')
-
