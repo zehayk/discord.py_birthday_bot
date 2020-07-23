@@ -4,7 +4,6 @@ import json
 import datetime
 import asyncio
 import discord
-import discord.ext
 from dotenv import load_dotenv
 
 load_dotenv()
