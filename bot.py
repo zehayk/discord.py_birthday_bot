@@ -77,10 +77,39 @@ async def on_message(msg):
                 await msg.channel.send("ID doesn't exist")
             file.close()
 
-    if msg.content.startswith('setbbchannel'):
+        if msg.content.startswith('+whenbd'):
+        # print(msg.author)
+        liszt = msg.content.split()
+        with open("birthdays.json") as file:
+            try:
+                if liszt[1] is not None:
+                    try:
+                        msgsender = msg.mentions[0].id
+                        try:
+                            if msg.mentions[1] is not None:
+                                await msg.channel.send(f'<@{msg.author.id}>, you can only @ping 1 person at a time!')
+                                return
+                        except IndexError:
+                            pass
+                    except IndexError:
+                        await msg.channel.send('`Exception error occurred, Server member not found.`'
+                                               '\nPlease enter valid @username.')
+                        return
+            except IndexError:
+                msgsender = msg.author.id
+            data = json.load(file)
+            try:
+                sender = data[str(server_id)][str(msgsender)]
+                month = sender['month']
+                day = sender['day']
+                await msg.channel.send(f"<@{msgsender}>'s birthday is on {month}/{day}")
+            except KeyError:
+                await msg.channel.send("Member doesn't exist in database. They haven't set their birthday yet.")
+            file.close()
+
+    if msg.content.startswith('+setbbchannel'):
         await msg.channel.send('`setting...`')
         channel_id = msg.channel.id
-        # print(channel_id)
 
         with open("birthdays.json", "r+") as file:
             data = json.load(file)
@@ -93,7 +122,7 @@ async def on_message(msg):
             json.dump(data, file)
             await msg.channel.send(f'Successfully set **#{msg.channel.name}** as announcement channel.')
 
-    if msg.content.startswith('bbset'):
+    if msg.content.startswith('+bbset'):
         await msg.channel.send('`setting...`')
 
         try:
@@ -103,40 +132,39 @@ async def on_message(msg):
             day = int(date[1])
 
             if month > 13 or month < 1:
-                await msg.channel.send(f"`Exception error occurred.\nAborting...`")
-                await msg.channel.send('Correct usage is: bbset {mm/dd}')
+                await msg.channel.send(f"`Exception error occurred.`")
+                await msg.channel.send('Correct usage is: bbset mm/dd {@another_person}')
                 return
             else:
                 pass
-
             if month in (1, 3, 5, 7, 8, 10, 12):
                 if day > 31 or day < 1:
-                    await msg.channel.send(f"`Exception error occurred.\nAborting...`")
-                    await msg.channel.send('Correct usage is: bbset {mm/dd}')
+                    await msg.channel.send(f"`Exception error occurred.`")
+                    await msg.channel.send('Correct usage is: bbset mm/dd {@another_person}')
                     return
                 else:
                     pass
             elif month in (4, 6, 9, 11):
                 if day > 30 or day < 1:
-                    await msg.channel.send(f"`Exception error occurred.\nAborting...`")
-                    await msg.channel.send('Correct usage is: bbset {mm/dd}')
+                    await msg.channel.send(f"`Exception error occurred.`")
+                    await msg.channel.send('Correct usage is: bbset mm/dd {@another_person}')
                     return
                 else:
                     pass
             elif month == 2:
                 if day > 29 or day < 1:
-                    await msg.channel.send(f"`Exception error occurred.\nAborting...`")
-                    await msg.channel.send('Correct usage is: bbset {mm/dd}')
+                    await msg.channel.send(f"`Exception error occurred.`")
+                    await msg.channel.send('Correct usage is: bbset mm/dd {@another_person}')
                     return
                 else:
                     pass
             else:
-                await msg.channel.send(f"`Exception error occurred.\nAborting...`")
-                await msg.channel.send('Correct usage is: bbset {mm/dd}')
+                await msg.channel.send(f"`Exception error occurred.`")
+                await msg.channel.send('Correct usage is: bbset mm/dd {@another_person}')
                 return
         except:
-            await msg.channel.send(f"`Exception error occurred.\nAborting...`")
-            await msg.channel.send('Correct usage is: bbset {mm/dd}')
+            await msg.channel.send(f"`Exception error occurred.`")
+            await msg.channel.send('Correct usage is: bbset mm/dd {@another_person}')
             return
 
         with open("birthdays.json", "r+") as file:
@@ -144,11 +172,33 @@ async def on_message(msg):
             srvid = str(server_id)
             if srvid not in data:
                 data[srvid] = {}
-            data[srvid][str(msgsender)] = {"month": month, "day": day}
+            try:
+                if liszt[2] is not None:
+                    try:
+                        msgsender = msg.mentions[0].id
+                        try:
+                            if msg.mentions[1] is not None:
+                                await msg.channel.send(f'<@{msg.author.id}>, you can only @ping 1 person at a time!')
+                                return
+                        except IndexError:
+                            pass
+                    except IndexError:
+                        await msg.channel.send('`Exception error occurred, Server member not found.`'
+                                               '\nPlease enter valid @username.')
+                        return
+                    data[srvid][str(msgsender)] = {"month": month, "day": day}
+            except IndexError:
+                msgsender = msg.author.id
+                data[srvid][str(msgsender)] = {"month": month, "day": day}
             file.close()
             file = open("birthdays.json", "w")
             json.dump(data, file)
-
-            await msg.channel.send(f"<@{msgsender}>`Success!`\nBirthday was set on {month}/{day}.")
+            await msg.channel.send(f"`Success!`\nBirthday was set on **{month}/{day}** for <@{msgsender}>.")
+            
+            if msg.content.startswith('+help'):
+                await msg.channel.send('`( {} = optional )`\n'
+                               '`+bbset mm/dd {@another_person}` - to set your birthday\n'
+                               '`+setbbchannel` - to set channel as birthday announcements channel\n'
+                               '`+whenbd {@another_person}` - to view your registered birth date\n')
 
 client.run(TOKEN)
